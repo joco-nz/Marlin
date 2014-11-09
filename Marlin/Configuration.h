@@ -211,15 +211,10 @@
 //    #define  DEFAULT_Ki 2.25
 //    #define  DEFAULT_Kd 440
 
-// Mendel Parts V9 on 12V <-- local customised/tuned
-    #define  DEFAULT_Kp 63.0
-    #define  DEFAULT_Ki 2.25
-    #define  DEFAULT_Kd 440
-
 // Custom tuned values using Auto Tune - Zeigler-Nichols no Overshoot
-//#define  DEFAULT_Kp (17.32/3)
-//#define  DEFAULT_Ki 2.27
-//#define  DEFAULT_Kd ((33.00*8)/3)
+#define  DEFAULT_Kp 27.19
+#define  DEFAULT_Ki 2.20
+#define  DEFAULT_Kd 224.25
 
 #endif // PIDTEMP
 
@@ -513,12 +508,13 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 //#define DEFAULT_MAX_FEEDRATE          {500, 500, 5, 25}    // (mm/sec)
 #define DEFAULT_MAX_FEEDRATE          {500, 500, 2, 25}    // (mm/sec)
 //#define DEFAULT_MAX_ACCELERATION      {9000,9000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
-#define DEFAULT_MAX_ACCELERATION      {450,450,10,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
+//#define DEFAULT_MAX_ACCELERATION      {450,450,10,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
+#define DEFAULT_MAX_ACCELERATION      {1000,1000,10,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
 
 //#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
 //#define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
-#define DEFAULT_ACCELERATION          450    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  450   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+#define DEFAULT_ACCELERATION          600    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  600   // X, Y, Z and E max acceleration in mm/s^2 for retracts
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
@@ -559,7 +555,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 #define EEPROM_CHITCHAT
 
 // Preheat Constants
-#define PLA_PREHEAT_HOTEND_TEMP 185
+#define PLA_PREHEAT_HOTEND_TEMP 180
 #define PLA_PREHEAT_HPB_TEMP 75
 #define PLA_PREHEAT_FAN_SPEED 255   // Insert Value between 0 and 255
 
@@ -812,6 +808,14 @@ const bool Z_MAX_ENDSTOP_INVERTING = true; // set to true to invert the logic of
 
 //defines used in the code
 #define DEFAULT_MEASURED_FILAMENT_DIA  DEFAULT_NOMINAL_FILAMENT_DIA  //set measured to nominal initially 
+
+/**********************************************************************\
+ * Support for filament endstop.
+ * Detect if filament has run out and pause the print.
+ * Comment out if don't want to use this feature.
+ **********************************************************************/
+ //#define ENABLE_FILAMENT_ENDSTOP   // Set to the pin value to use pins.h. Suggest 1 as is typcially a free digital pin on RAMPS 1.4 AUX-1
+
 
 #include "Configuration_adv.h"
 #include "thermistortables.h"

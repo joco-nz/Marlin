@@ -183,6 +183,8 @@ void calculate_delta(float cartesian[3]);
 void calculate_SCARA_forward_Transform(float f_scara[3]);
 #endif
 void prepare_move();
+void pause();				// added to support filament endstop
+void setup_pausepin();		// added to support filament endstop
 void kill();
 void Stop();
 

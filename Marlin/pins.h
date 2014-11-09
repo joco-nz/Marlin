@@ -628,6 +628,10 @@
     #define E1_DIR_PIN         34
     #define E1_ENABLE_PIN      30
 
+#ifdef ENABLE_FILAMENT_ENDSTOP
+	#define FILAMENT_ENDSTOP_PIN    1
+#endif
+
 #if MOTHERBOARD == 34  //FMM added for Filament Extruder
 #ifdef FILAMENT_SENSOR
 	  //define analog pin for the filament width sensor input

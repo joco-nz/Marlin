@@ -388,6 +388,11 @@ unsigned long chdkHigh = 0;
 boolean chdkActive = false;
 #endif
 
+//Filament endstop. Trapping to stop too many pauses being put onto the queue
+#ifdef FILAMENT_ENDSTOP_PIN
+static bool pauseAdded = false;
+#endif
+
 //===========================================================================
 //=============================Routines======================================
 //===========================================================================
@@ -460,6 +465,7 @@ void setup_killpin()
   #endif
 }
 
+// Triggers a camera by emulating a Canon RC-1 Remote using M240
 void setup_photpin()
 {
   #if defined(PHOTOGRAPH_PIN) && PHOTOGRAPH_PIN > -1
@@ -526,10 +532,14 @@ void servo_init()
   #endif
 }
 
-
+//
+//  fn: setup
+//  descr: Called once by the arduino system to allow sketch setup
+//
 void setup()
 {
   setup_killpin();
+  setup_pausepin();	// added for filament endstop
   setup_powerhold();
   MYSERIAL.begin(BAUDRATE);
   SERIAL_PROTOCOLLNPGM("start");
@@ -570,12 +580,12 @@ void setup()
   // loads data from EEPROM if available else uses defaults (and resets step acceleration rate)
   Config_RetrieveSettings();
 
-  tp_init();    // Initialize temperature loop
-  plan_init();  // Initialize planner;
-  watchdog_init();
-  st_init();    // Initialize stepper, this enables interrupts!
-  setup_photpin();
-  servo_init();
+  tp_init();        // Initialize temperature loop
+  plan_init();      // Initialize planner;
+  watchdog_init();  // 
+  st_init();        // Initialize stepper, this enables interrupts!
+  setup_photpin();  // Triggers a camera by emulating a Canon RC-1 Remote using M240
+  servo_init();     // 
   
 
   lcd_init();
@@ -594,7 +604,10 @@ void setup()
 #endif // Z_PROBE_SLED
 }
 
-
+//
+//  fn: loop
+//  descr: Main loop for the sketch. Called continually for as long as firmware is running.
+//
 void loop()
 {
   if(buflen < (BUFSIZE-1))
@@ -2767,6 +2780,10 @@ Sigma_Exit:
         SERIAL_PROTOCOLPGM(MSG_Z_MAX);
         SERIAL_PROTOCOLLN(((READ(Z_MAX_PIN)^Z_MAX_ENDSTOP_INVERTING)?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
       #endif
+      #if defined(FILAMENT_ENDSTOP_PIN) && FILAMENT_ENDSTOP_PIN > -1
+        SERIAL_PROTOCOLPGM(MSG_FILAMENT_ENDSTOP);
+        SERIAL_PROTOCOLLN(((READ(FILAMENT_ENDSTOP_PIN))?MSG_ENDSTOP_HIT:MSG_ENDSTOP_OPEN));
+      #endif
       break;
       //TODO: update for all axis, use for loop
     #ifdef BLINKM
@@ -4301,6 +4318,14 @@ void manage_inactivity()
     if( 0 == READ(KILL_PIN) )
       kill();
   #endif
+  // Added for filament endstop
+  #if defined(FILAMENT_ENDSTOP_PIN) && FILAMENT_ENDSTOP_PIN > -1
+    if( 0 != READ(FILAMENT_ENDSTOP_PIN) )
+      pause();
+	else
+      pauseAdded = false;
+  #endif
+
   #if defined(CONTROLLERFAN_PIN) && CONTROLLERFAN_PIN > -1
     controllerFan(); //Check if fan should be turned on to cool stepper drivers down
   #endif
@@ -4473,5 +4498,24 @@ bool setTargetedHotend(int code){
     }
   }
   return false;
+}
+
+void setup_pausepin()
+{
+#if defined(FILAMENT_ENDSTOP_PIN) && FILAMENT_ENDSTOP_PIN > -1
+  pinMode(FILAMENT_ENDSTOP_PIN,INPUT);
+  WRITE(FILAMENT_ENDSTOP_PIN,HIGH);
+  pauseAdded = false;
+#endif
+}
+
+void pause()
+{
+#if defined(FILAMENT_ENDSTOP_PIN) && FILAMENT_ENDSTOP_PIN > -1
+  if(pauseAdded) {
+     enquecommand("M600");
+     pauseAdded = true;
+  }
+#endif
 }
 
